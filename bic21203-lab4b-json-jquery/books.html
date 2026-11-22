@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q2 - Book Collection</title>
+</head>
+<body>
+    <h1>Book Collection</h1>
+    <p id="errorMessage" role="alert" style="color: red;"></p>
+
+    <h2>(a) Title of the First Book</h2>
+    <p id="firstBookTitle"></p>
+
+    <h2>(b) Author of the Second Book</h2>
+    <p id="secondBookAuthor"></p>
+
+    <h2>(c) Genres of Both Books</h2>
+    <ul id="bookGenres"></ul>
+
+    <script>
+        async function loadBooks() {
+            const errorDisplay = document.getElementById("errorMessage");
+            const firstBookTitle = document.getElementById("firstBookTitle");
+            const secondBookAuthor = document.getElementById("secondBookAuthor");
+            const bookGenresList = document.getElementById("bookGenres");
+
+            try {
+                const response = await fetch("books.json");
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (!data.books || data.books.length < 2) {
+                    throw new Error("Invalid JSON format: expected at least two books.");
+                }
+
+                // (a) Title of the first book
+                firstBookTitle.textContent = data.books[0].title;
+
+                // (b) Author of the second book
+                secondBookAuthor.textContent = data.books[1].author;
+
+                // (c) Genres of both books, grouped by book title
+                data.books.forEach((book) => {
+                    const listItem = document.createElement("li");
+                    listItem.textContent = `${book.title} — ${book.genres.join(", ")}`;
+                    bookGenresList.appendChild(listItem);
+                });
+
+                console.log("books.json parsed successfully:", data);
+            } catch (error) {
+                errorDisplay.textContent = "Unable to load book data. Please make sure books.json is valid and opened via a local server.";
+                console.error("Failed to load books.json:", error);
+            }
+        }
+
+        loadBooks();
+    </script>
+</body>
+</html>
